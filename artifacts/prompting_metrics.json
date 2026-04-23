@@ -1,0 +1,87 @@
+{
+  "dataset_path": "spam.csv",
+  "model": "qwen2.5:0.5b",
+  "url": "http://127.0.0.1:8001",
+  "sample_count": 800,
+  "class_balance": {
+    "ham": 400,
+    "spam": 400
+  },
+  "samples_per_class": 400,
+  "max_attempts": 2,
+  "techniques": [
+    {
+      "technique": "zero_shot",
+      "technique_title": "zero-shot",
+      "metrics": {
+        "accuracy": 0.4938,
+        "precision": 0.4958,
+        "recall": 0.735,
+        "f1": 0.5921,
+        "tp": 294.0,
+        "tn": 101.0,
+        "fp": 299.0,
+        "fn": 106.0,
+        "sample_count": 800.0,
+        "parse_error_rate": 0.0,
+        "request_error_rate": 0.0
+      }
+    },
+    {
+      "technique": "cot",
+      "technique_title": "CoT",
+      "metrics": {
+        "accuracy": 0.5487,
+        "precision": 0.5358,
+        "recall": 0.73,
+        "f1": 0.618,
+        "tp": 292.0,
+        "tn": 147.0,
+        "fp": 253.0,
+        "fn": 108.0,
+        "sample_count": 800.0,
+        "parse_error_rate": 0.0262,
+        "request_error_rate": 0.0
+      }
+    },
+    {
+      "technique": "few_shot",
+      "technique_title": "few-shot",
+      "metrics": {
+        "accuracy": 0.6338,
+        "precision": 0.6474,
+        "recall": 0.5875,
+        "f1": 0.616,
+        "tp": 235.0,
+        "tn": 272.0,
+        "fp": 128.0,
+        "fn": 165.0,
+        "sample_count": 800.0,
+        "parse_error_rate": 0.0125,
+        "request_error_rate": 0.0
+      }
+    },
+    {
+      "technique": "cot_few_shot",
+      "technique_title": "CoT + few-shot",
+      "metrics": {
+        "accuracy": 0.5925,
+        "precision": 0.6045,
+        "recall": 0.535,
+        "f1": 0.5676,
+        "tp": 214.0,
+        "tn": 260.0,
+        "fp": 140.0,
+        "fn": 186.0,
+        "sample_count": 800.0,
+        "parse_error_rate": 0.0925,
+        "request_error_rate": 0.0
+      }
+    }
+  ],
+  "system_prompts": {
+    "cot": "Ты классификатор SMS-спама.\nПрименяй технику Chain-of-Thought (CoT): перед финальным ответом последовательно оцени признаки:\n1) срочный призыв к действию;\n2) обещание выигрыша или выгоды;\n3) запрос денег, персональных данных, перехода по ссылке или ответа на короткий номер;\n4) признаки обычной личной переписки.\n\nВерни только JSON и ничего больше:\n{\"reasoning\":\"<краткая строка>\",\"verdict\":<0 или 1>}\n\nТребования:\n- reasoning: одна строка на русском языке, 10-25 слов;\n- verdict: цифра 1 для spam и 0 для ham.",
+    "few_shot": "Ты классификатор SMS-спама.\nИспользуй few-shot подход и опирайся на примеры:\n\nПример 1:\nSMS: \"Free entry in 2 a wkly comp to win FA Cup final tkts. Text FA to 87121.\"\nОтвет: {\"reasoning\":\"Есть обещание выигрыша и призыв отправить сообщение на короткий номер.\",\"verdict\":1}\n\nПример 2:\nSMS: \"Hey, are we still meeting near the station at 7?\"\nОтвет: {\"reasoning\":\"Обычное личное сообщение без рекламы, давления и попытки выманить деньги.\",\"verdict\":0}\n\nПример 3:\nSMS: \"URGENT! Your account has been selected for a cash reward, call now.\"\nОтвет: {\"reasoning\":\"Срочность и обещание денежного вознаграждения указывают на типичный спам-шаблон.\",\"verdict\":1}\n\nФормат ответа для нового сообщения:\n{\"reasoning\":\"<краткая строка>\",\"verdict\":<0 или 1>}\n\nТребования:\n- reasoning: одна строка на русском языке;\n- verdict: цифра 1 для spam и 0 для ham.",
+    "cot_few_shot": "Ты классификатор SMS-спама.\nИспользуй CoT + few-shot:\n1) сначала внутренне оцени признаки спама (срочность, обещание выгоды, финансовый или персональный риск, нейтральность переписки);\n2) сверяйся с примерами;\n3) после анализа выдай итог только в JSON.\n\nПример 1:\nSMS: \"WINNER!! As a valued network customer you have been selected to receive a prize.\"\nОтвет: {\"reasoning\":\"Маркер WINNER и обещание приза указывают на рекламно-мошеннический паттерн.\",\"verdict\":1}\n\nПример 2:\nSMS: \"Can you send me the report before lunch?\"\nОтвет: {\"reasoning\":\"Рабочая просьба без рекламы, без призов и без давления по оплате.\",\"verdict\":0}\n\nВыходной формат строго:\n{\"reasoning\":\"<краткая строка>\",\"verdict\":<0 или 1>}\n\nТребования:\n- reasoning: одна строка на русском языке;\n- verdict: цифра 1 для spam и 0 для ham."
+  }
+}

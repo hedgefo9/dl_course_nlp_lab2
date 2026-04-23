@@ -1,0 +1,22 @@
+services:
+  llm_service:
+    build:
+      context: .
+      dockerfile: llm_service/Dockerfile
+    container_name: nlp_lab2_llm_service
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_MODEL: qwen2.5:0.5b
+      FASTAPI_HOST: 0.0.0.0
+      FASTAPI_PORT: 8000
+      OLLAMA_API_URL: http://127.0.0.1:11434
+      OLLAMA_REQUEST_TIMEOUT: 180
+    ports:
+      - "8001:8000"
+      - "11435:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
